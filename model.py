@@ -3,7 +3,6 @@ https://github.com/microsoft/human-pose-estimation.pytorch/blob/master/lib/model
 '''
 
 from tensorflow import keras
-from tensorflow.keras import layers
 
 from configs import *
 
@@ -24,7 +23,7 @@ class PoseResNet(keras.Model):
             POSE_RESNET.NUM_DECONV_FILTERS, # [256, 256, 256]
             POSE_RESNET.NUM_DECONV_KERNELS, # [4, 4, 4]
         )
-        self.final_layer = layers.Conv2D(
+        self.final_layer = keras.layers.Conv2D(
             filters=NUM_KEYPOINTS,
             kernel_size=POSE_RESNET.FINAL_CONV_KERNEL,
             strides=1,
@@ -55,7 +54,7 @@ class PoseResNet(keras.Model):
                 self._get_deconv_cfg(num_kernels[i])
             planes = num_filters[i]
 
-            deconvs.add(layers.Conv2DTranspose(
+            deconvs.add(keras.layers.Conv2DTranspose(
                 filters=planes,
                 kernel_size=kernel,
                 strides=2,
@@ -63,8 +62,8 @@ class PoseResNet(keras.Model):
                 #output_padding=output_padding,
                 use_bias=POSE_RESNET.DECONV_WITH_BIAS
             ))
-            deconvs.add(layers.BatchNormalization(momentum=BN_MOMENTUM))
-            deconvs.add(layers.ReLU())
+            deconvs.add(keras.layers.BatchNormalization(momentum=BN_MOMENTUM))
+            deconvs.add(keras.layers.ReLU())
         return deconvs
 
     def call(self, inputs, training=None, mask=None):
@@ -75,5 +74,5 @@ class PoseResNet(keras.Model):
 
     def build_graph(self):
         # https://stackoverflow.com/questions/61427583/how-do-i-plot-a-keras-tensorflow-subclassing-api-model
-        inputs = layers.Input(shape=IMG_SHAPE, name='InputImage')
+        inputs = keras.layers.Input(shape=IMG_SHAPE, name='InputImage')
         return keras.Model(inputs=inputs, outputs=self.call(inputs))
